@@ -161,7 +161,7 @@ You'll need to get your data into GeoJSON or TopoJSON to visualize it in d3
 
 ### Anatomy of GeoJSON and geographic types:
 
-![geojson_io](../images/geojson-io)
+![geojson_io](../images/geojson-io.png)
 
 Sandbox: [http://geojson.io/](http://geojson.io/)
 
