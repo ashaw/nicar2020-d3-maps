@@ -1,0 +1,26 @@
+<!doctype html>
+<html>
+  <head>
+    <style>
+      #container {
+        background:white;
+        width:100px;
+        height:100px;
+      }
+    </style>
+  </head>
+  <body>    
+    <div id="container"></div>
+
+    <script>
+      var selection = document.getElementById("container");
+      selection.style.background = 'steelblue';
+
+      var child = document.createElement("div");
+      child.style.width = '50px';
+      child.style.height = '50px';
+      child.style.background = 'red';
+      container.appendChild(child)
+    </script>
+  </body>
+</html>

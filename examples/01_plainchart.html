@@ -1,0 +1,26 @@
+<!doctype html>
+<html>
+  <head>
+  </head>
+  <body>
+    <style>
+      #chart {
+        width:100%;
+        height:300px;
+        position:relative;
+      }
+      .bar {
+        float:left;
+        background:orange;
+        bottom:0;
+        position:absolute;
+        width:calc(33% - 10px);
+      }
+    </style>
+    <div id="chart">
+      <div class="bar" style="height:25%;">&nbsp;</div>
+      <div class="bar" style="left:33%; height:50%;">&nbsp;</div>
+      <div class="bar" style="left:66%; height:75%;">&nbsp;</div>
+    </div>
+  </body>
+</html>
