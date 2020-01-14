@@ -1,6 +1,6 @@
 # Mapping with d3 - NICAR 2020
 
-Al Shaw // ProPublica // al.shaw@propublica.org // @a_l
+Al Shaw • ProPublica • al.shaw@propublica.org • @a_l
 
 ## 1. Review of d3 and its limitations
 
@@ -100,7 +100,7 @@ Here we're "binding" the data to HTML elements ourselves.
 
 Using JavaScript, we can do similar things programmatically.
 
-When making charts in d3, we usually start with empty elements. JS creates and then styles the elements.
+When making charts in d3, we usually start with empty elements. The d3 library creates and then styles the elements.
 
 ### OK let's make the same chart in d3 now. We'll get to maps soon!
 
@@ -148,7 +148,7 @@ Geographic data is like a spreadsheet, except it has a column that contains spat
 
 * SHP
 * GeoJSON
-* TopoJSON: Like GeoJSON, but more compact
+* TopoJSON: Like GeoJSON, but more compact and can be converted to GeoJSON.
 * Regular CSVs with a geometry column
 
 ### Tools for converting geo data
@@ -161,7 +161,7 @@ You'll need to get your data into GeoJSON or TopoJSON to visualize it in d3
 
 ### Anatomy of GeoJSON and geographic types:
 
-![geojson_io](../images/geojson-io.png)
+![geojson_io](https://raw.githubusercontent.com/ashaw/nicar2020-d3-maps/master/images/geojson-io.png)
 
 Sandbox: [http://geojson.io/](http://geojson.io/)
 
@@ -267,7 +267,6 @@ Sandbox: [http://geojson.io/](http://geojson.io/)
 * International: [Natural Earth](http://www.naturalearthdata.com/)
 * National: US Census ([Cartographic Boundary Files](https://www.census.gov/geographies/mapping-files/time-series/geo/carto-boundary-file.html) have the best shoreline), [TopoJSON US Atlas](https://github.com/topojson/us-atlas)
 * albersUsa: Combined data/projection for a US map with Alaska and Hawaii (available in the TopJSON Atlas). This is a good choice for national state or county maps.
-* State and local governments
 
 ![albersUsa](https://raw.githubusercontent.com/topojson/us-atlas/master/img/states.png)
 
@@ -277,24 +276,116 @@ Sandbox: [http://geojson.io/](http://geojson.io/)
 
 This isn't all that much different from making a bar chart, with a couple exceptions: you need to tell d3 what projection you're going to use, and you need to tell it to parse the TopoJSON.
 
+Note: this example will double up state borders, but I'm showing it because it's the simplest way to get to a 'Hello World' map with TopoJSON. See 04_albersusa_mesh.html for the cleaner non-doubled version.
+
+```
+// 03_albersusa.html
+d3.json("https://cdn.jsdelivr.net/npm/us-atlas@3/states-albers-10m.json").then(function(data) {
+
+  // this works because the data is already projected to Albers
+  var path = d3.geoPath();
+
+  // get it into geojson
+  data = topojson.feature(data, data.objects.states);
+
+  var container = d3.select("#map")
+  container.selectAll("path")
+    .data(data.features) // same data->enter->append pattern as our bar chart
+    .enter()
+    .append("path") // Remember now we're operating on every item
+      .attr("stroke", "#222")
+      .attr("fill", "transparent")
+      .attr("stroke-width", "0.5")
+      .attr("d", path)
+
+})
+```
+
+Styling the map (for simplicity we're going to stay with the doubled-borders version).
+
+```
+// 05_albersusa_styled.html
+d3.json("https://cdn.jsdelivr.net/npm/us-atlas@3/states-albers-10m.json").then(function(data) {
+
+  // this works because the data is already projected to Albers
+  var path = d3.geoPath();
+
+  // get it into geojson
+  data = topojson.feature(data, data.objects.states);
+
+  var container = d3.select("#map")
+  container.selectAll("path")
+    .data(data.features)
+    .enter()
+    .append("path")
+      .attr("stroke", "#222")
+      .attr("fill", function(d) { // "d" is the element in question
+        if (d.id === "22") {
+          return "red";
+        }
+        return "transparent"
+      })
+      .attr("stroke-width", "0.5")
+      .attr("d", path)
+
+})
+```
+
+OK, now let's style the whole country based on a dataset. In the data folder is a CSV of [US median income](https://censusreporter.org/data/map/?table=B06011&geo_ids=040|01000US) modified from CensusReporter
+
+```
+// 06_albersusa_styled_data.html
+
+// Promises let you queue up multiple asynchronous requests
+// and then call a function when they're both done.
+// In this case, we'll load both our TopoJSON and our CSV 
+// before making the graphic.
+Promise.all([
+    d3.json("https://cdn.jsdelivr.net/npm/us-atlas@3/states-albers-10m.json"),
+    d3.csv("../data/acs.csv")
+  ]
+).then(function(files){
+  // Defining what comes out of the promises
+  var geom = files[0];
+  var acs  = files[1];
+
+  // Let's organize our ACS data by
+  // turning it into an object.
+  // We're doing this so we can eventually 
+  // select out data by fips code in d3
+  var acsByFips = {};
+  for (var i = 0; i < acs.length; i++) {
+    acsByFips[acs[i].geoid] = +acs[i].income;
+  }
+
+  // let's copy breaks from the CensusReporter site: https://censusreporter.org/data/map/?table=B06011&geo_ids=040|01000US
+  var domain = [24123, 29494, 34865, 40236, 45607, 50978];
+  // This is telling d3 to scale the breaks to a set of 6 sequential greens.
+  var scale = d3.scaleThreshold().domain(domain).range(d3.schemeGreens[6]) 
+
+  // this works because the data is already projected to Albers
+  var path = d3.geoPath();
+
+  // get it into geojson
+  geom = topojson.feature(geom, geom.objects.states);
+
+  var container = d3.select("#map")
+  container.selectAll("path")
+    .data(geom.features)
+    .enter()
+    .append("path")
+      .attr("stroke", "#222")
+      .attr("fill", function(d) {
+        return scale(acsByFips[d.id])
+      })
+      .attr("stroke-width", "0.5")
+      .attr("d", path)
+})
+
+```
+
 ### Let's make a local map with GeoJSON
 
 ### Let's make a locator map with arbitrary bounds
-
-## 4. Annotations 
-
-## 5. Base maps!
-
-
-
-
-
-
-
-
-
-
-
-
 
 

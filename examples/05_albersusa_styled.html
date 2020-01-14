@@ -1,0 +1,38 @@
+<!doctype html>
+<html>
+  <head>
+    <script src="../vendor/d3.v5.min.js"></script>
+    <script src="../vendor/topojson-client.min.js"></script>
+
+  </head>
+  <body>
+    <svg id="map" viewBox="0 0 975 610"></svg>
+
+    <script>
+      d3.json("https://cdn.jsdelivr.net/npm/us-atlas@3/states-albers-10m.json").then(function(data) {
+
+        // this works because the data is already projected to Albers
+        var path = d3.geoPath();
+
+        // get it into geojson
+        data = topojson.feature(data, data.objects.states);
+
+        var container = d3.select("#map")
+        container.selectAll("path")
+          .data(data.features)
+          .enter()
+          .append("path")
+            .attr("stroke", "#222")
+            .attr("fill", function(d) {
+              if (d.id === "22") {
+                return "red";
+              }
+              return "transparent"
+            })
+            .attr("stroke-width", "0.5")
+            .attr("d", path)
+
+      })
+    </script>
+  </body>
+</html>
