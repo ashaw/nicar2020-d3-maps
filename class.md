@@ -386,6 +386,103 @@ Promise.all([
 
 ### Let's make a local map with GeoJSON
 
-### Let's make a locator map with arbitrary bounds
+If you want to make a map of an arbitrary area, or use data that hasn't been preprojected, there are a couple more wrinkles that d3 doesn't take care of for you.
 
+Let's try to recreate this [New Orleans mayoral election map](http://elections.thelensnola.org/2017/municipal-parochial-primary/) from The Lens as an example. (The first 2 steps are done for you -- the NOLA precincts data is in the data folder)
+
+1. Grab the voting precincts [geographic data](https://portal-nolagis.opendata.arcgis.com/datasets/ca0f4261673541d798551f5cddc54bd6_0)
+
+2. Convert the shapefile to GeoJSON using `ogr2ogr`:
+
+```
+ogr2ogr -f GeoJSON nola_precincts.geojson Voting_Precincts.shp
+
+```
+
+3. Download the election results data [this is done for you, it's in the data folder]
+
+4. Set up the room in the same way we did the national map, with a few important exceptions
+
+Notes:
+
+* Veltman's [d3 state plane projections](https://github.com/veltman/d3-stateplane)
+* [Fitting a given geography to a screen extent](https://bl.ocks.org/mbostock/5126418)
+
+```
+Promise.all([
+    d3.json("../data/nola_precincts.geojson"),
+    d3.csv("../data/nola_mayoral_results.csv")
+  ]
+).then(function(files){
+  // Defining what comes out of the promises
+  var geom     = files[0];
+  var results  = files[1];
+
+  // Just like fips codes before, we're going to
+  // index on precinct names.
+  // But we have to clean them a bit.. because
+  // the geography formats them as:
+  // 1-1 and the results file formats them as 01 01
+  var cleanPrecinctName = function(inp) {
+    return inp.replace(/(^0| 0)/g," ")
+      .replace(/^( )/g,"")
+      .replace(/ /g,"-");
+  };
+
+  // pluck the candidate that got the most 
+  // votes out of each row
+  var getWinner = function(row) {
+    var winner = null;
+    for (cand in row) {
+      if (cand !== "Precinct") {
+        if (!winner) {
+          winner = cand;
+        } else if (+row[cand] > +row[winner]) {
+          winner = cand;
+        }
+      }
+    }
+    return winner;
+  }
+
+  var resultsByPrecinct = {};
+  for (var i = 0; i < results.length; i++) {
+    var precinct = cleanPrecinctName(results[i]["Precinct"])
+    resultsByPrecinct[precinct] = getWinner(results[i])
+  }
+
+  // assign a unique color for each candidate
+  var candAry = Object.keys(results[0])
+  candAry.shift() // get rid of "Precinct"
+  var candidateColors = {};
+  for (i = 0; i < candAry.length; i++) {
+    candidateColors[candAry[i]] = d3.schemeCategory10[i];
+  }
+  console.log(candidateColors)
+
+  // set the projection to the South Louisiana state plane
+  // and then fit geometry to the div size
+  var projection = d3.geoConicConformal()
+    .parallels([29 + 18 / 60, 30 + 42 / 60])
+    .rotate([91 + 20 / 60, 0])
+    .fitSize([975, 610], geom)
+  
+    // set the path to the projection
+    var path = d3.geoPath()
+      .projection(projection)
+
+    var container = d3.select("#map")
+    container.selectAll("path")
+      .data(geom.features)
+      .enter()
+      .append("path")
+        .attr("stroke", "#222")
+        .attr("fill", function(d) {
+          // select out the color for the winner based on our cleaned precinct id
+          return candidateColors[resultsByPrecinct[d.properties.PRECINCTID]]
+        })
+        .attr("stroke-width", "0.5")
+        .attr("d", path)
+})
+```
 
