@@ -390,6 +390,9 @@ If you want to make a map of an arbitrary area, or use data that hasn't been pre
 
 Let's try to recreate this [New Orleans mayoral election map](http://elections.thelensnola.org/2017/municipal-parochial-primary/) from The Lens as an example. (The first 2 steps are done for you -- the NOLA precincts data is in the data folder)
 
+![thelens_elections](https://raw.githubusercontent.com/ashaw/nicar2020-d3-maps/master/images/thelends-elections.png)
+
+
 1. Grab the voting precincts [geographic data](https://portal-nolagis.opendata.arcgis.com/datasets/ca0f4261673541d798551f5cddc54bd6_0)
 
 2. Convert the shapefile to GeoJSON using `ogr2ogr`:
