@@ -409,6 +409,8 @@ Notes:
 * [Fitting a given geography to a screen extent](https://bl.ocks.org/mbostock/5126418)
 
 ```
+// 07_nola_mayoral_map.html
+
 Promise.all([
     d3.json("../data/nola_precincts.geojson"),
     d3.csv("../data/nola_mayoral_results.csv")

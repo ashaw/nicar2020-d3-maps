@@ -60,7 +60,6 @@
         for (i = 0; i < candAry.length; i++) {
           candidateColors[candAry[i]] = d3.schemeCategory10[i];
         }
-        console.log(candidateColors)
 
         // set the projection to the South Louisiana state plane
         // and then fit geometry to the div size
@@ -69,6 +68,7 @@
           .rotate([91 + 20 / 60, 0])
           .fitSize([975, 610], geom)
 
+          // set the path to the projection
           var path = d3.geoPath()
             .projection(projection)
 
@@ -79,6 +79,7 @@
             .append("path")
               .attr("stroke", "#222")
               .attr("fill", function(d) {
+                // select out the color for the winner based on our cleaned precinct id
                 return candidateColors[resultsByPrecinct[d.properties.PRECINCTID]]
               })
               .attr("stroke-width", "0.5")
