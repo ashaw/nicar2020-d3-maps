@@ -333,6 +333,9 @@ d3.json("https://cdn.jsdelivr.net/npm/us-atlas@3/states-albers-10m.json").then(f
 
 OK, now let's style the whole country based on a dataset. In the data folder is a CSV of [US median income](https://censusreporter.org/data/map/?table=B06011&geo_ids=040|01000US) modified from CensusReporter
 
+![censusreporter](https://raw.githubusercontent.com/ashaw/nicar2020-d3-maps/master/images/censusreporter.png)
+
+
 ```
 // 06_albersusa_styled_data.html
 
