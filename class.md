@@ -280,7 +280,7 @@ Note: this example will double up state borders, but I'm showing it because it's
 
 ```
 // 03_albersusa.html
-d3.json("https://cdn.jsdelivr.net/npm/us-atlas@3/states-albers-10m.json").then(function(data) {
+d3.json("../data/states-albers-10m.json").then(function(data) {
 
   // this works because the data is already projected to Albers
   var path = d3.geoPath();
@@ -305,7 +305,7 @@ Styling the map (for simplicity we're going to stay with the doubled-borders ver
 
 ```
 // 05_albersusa_styled.html
-d3.json("https://cdn.jsdelivr.net/npm/us-atlas@3/states-albers-10m.json").then(function(data) {
+d3.json("../data/states-albers-10m.json").then(function(data) {
 
   // this works because the data is already projected to Albers
   var path = d3.geoPath();
@@ -344,7 +344,7 @@ OK, now let's style the whole country based on a dataset. In the data folder is 
 // In this case, we'll load both our TopoJSON and our CSV 
 // before making the graphic.
 Promise.all([
-    d3.json("https://cdn.jsdelivr.net/npm/us-atlas@3/states-albers-10m.json"),
+    d3.json("../data/states-albers-10m.json"),
     d3.csv("../data/acs.csv")
   ]
 ).then(function(files){
