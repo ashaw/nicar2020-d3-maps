@@ -405,7 +405,7 @@ ogr2ogr -f GeoJSON nola_precincts.geojson Voting_Precincts.shp
 
 ```
 
-3. Download the election results data [this is done for you, it's in the data folder]
+3. Download the [election results data](https://voterportal.sos.la.gov/static/2017-10-14) [this is done for you, it's in the data folder]
 
 4. Set up the room in the same way we did the national map, with a few important exceptions
 

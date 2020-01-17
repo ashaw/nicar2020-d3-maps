@@ -9,7 +9,7 @@
     <svg id="map" viewBox="0 0 975 610"></svg>
 
     <script>
-      d3.json("https://cdn.jsdelivr.net/npm/us-atlas@3/states-albers-10m.json").then(function(data) {
+      d3.json("../data/states-albers-10m.json").then(function(data) {
 
         // this works because the data is already projected to Albers
         var path = d3.geoPath();
